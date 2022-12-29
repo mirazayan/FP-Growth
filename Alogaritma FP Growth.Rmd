@@ -1,14 +1,15 @@
 ---
-title: "Alogaritma FP GROWTH dengan R "
+title: "Allogaritma FP Growth dengan R"
+author: "Mira Zayan-Institut Teknologi Statistika dan Bisnis Muhammadiyah"
 date: "`r Sys.Date()`"
-author: Mira Zayan-Institut Teknologi Statistika dan Bisnis Muhammadiyah
-output:
-  rmdformats::downcute:
-    self_contained: true
-    thumbnails: true
-    lightbox: true
-    gallery: false
-    highlight: tango
+output: 
+  html_document:
+    theme: flatly
+    higlight: zenburn
+    toc: true
+    toc_float:
+      collapsed: true
+    df_print: paged
 bibliography: references.bib
 ---
 
@@ -30,12 +31,22 @@ Adalah salah satu dari beberapa metodologi penambangan pola yang sering berpenga
 # Eksperimen Alogaritma FP Growth
 ## Library
 
-```{r}
+```{r warning=FALSE}
 library(readr)
-store_data <- read_csv("store_data.csv")
-
+df1 <- read_csv("store_data.csv")
+df1
 ```
 
+```{r}
+library(Matrix)
+library(arules)
+df2 = read.transactions("store_data.csv",sep=",",rm.duplicates=TRUE)
+```
+
+```{r}
+table = as(df2,"transactions")
+table
+```
 
 
 # Referensi
