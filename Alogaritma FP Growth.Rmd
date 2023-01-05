@@ -1,5 +1,5 @@
 ---
-title: "Allogaritma FP Growth dengan R"
+title: "Alogaritma FP Growth dengan R"
 author: "Mira Zayan-Institut Teknologi Statistika dan Bisnis Muhammadiyah"
 date: "`r Sys.Date()`"
 output: 
@@ -24,7 +24,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Algoritma FP Growth
-Adalah salah satu dari beberapa metodologi penambangan pola yang sering berpengaruh, di mana pola (misalnya, kumpulan item, urutan, subpohon, atau substruktur) sering terjadi jika frekuensi kemunculannya dalam database tidak kurang dari ambang minimum support yang ditentukan.
+  Algoritma Frequent Pattern Growth (FP-Growth) adalah salah satu alternatif algoritma yang dapat digunakan untuk menentukan himpunan data yang paling sering muncul (frequent itemset) dalam sebuah kumpulan data. FP-Growth dapat menemukan frekuensi itemset dengan hanya sedikit mengakses pada database aslinya, dan pendekatannya adalah yang paling efisien. (Wiyana,2018)
+
+ Algoritma FP-Growth merupakan pengembangan dari algoritma Apriori. Algoritma FP-Growth  dapat menghindari permasalahan jika jumlah calon itemset nya terlalu besar. FP-Growth menggunakan konsep pembangunan tree dalam pencarian frequent itemset. Hal tersebut yang menyebabkan algoritma FP-Growth lebih cepat dari algoritma Apriori. Dengan menggunakan FP-Tree, algoritma FP-Growth dapat langsung mengekstrak frequent itemset dari FP-Tree. Penggalian itemset yang frequent dengan menggunakan algoritma FP-Growth akan dilakukan dengan cara membangkitkan struktur data tree. (Erwin, 2009)
+ 
+Kesimpulan : Algoritma FP-Growth adalah perhitungan alogaritma untuk menampilkan item/data yang paling sering muncul dengan konsep tree (FP-Tree) untuk menentukan frekuensi item terbanyak.
+
 
 # Tahapan Algoritma FP Growth
 
@@ -36,17 +41,60 @@ library(readr)
 df1 <- read_csv("store_data.csv")
 df1
 ```
+## Memanggil Library
 
 ```{r}
 library(Matrix)
 library(arules)
 df2 = read.transactions("store_data.csv",sep=",",rm.duplicates=TRUE)
 ```
+## Memanggil Data
 
 ```{r}
 table = as(df2,"transactions")
 table
 ```
+```{r}
+read.transactions(file = "store_data.csv",
+                  format = "single",
+                  sep = "\t",
+                  cols = c(1,2),
+                  skip = 1)
+```
 
+```{r}
+# Menghasilkan model Market Basket Analysis
+mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
+
+
+```{r}
+# Menampilkan jumlah kombinasi dari produk yang terdapat pada daftar transaksi yang ada
+inspect(apriori(df2, parameter = list(support = .1, minlen = 2, target = 'frequent itemsets')))
+```
+```{r}
+data_item <- itemFrequency(df2, type = "absolute")
+
+#Melakukan sorting pada data_item
+data_item <- sort(data_item, decreasing = T)
+
+#Mengambil 3 item pertama, atau bisa dengan data_item[1:3]
+head(data_item, 3)
+```
+
+
+## Summary Data
+
+```{r}
+summary.default(table)
+summary(table)
+```
+
+
+## Item Frequency
+```{r}
+itemFrequencyPlot(table,topN = 15, main="Item Frequency")
+
+```
+ 
 
 # Referensi
