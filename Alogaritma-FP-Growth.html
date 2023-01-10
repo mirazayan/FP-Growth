@@ -11,7 +11,7 @@
 
 <meta name="author" content="Mira Zayan-Institut Teknologi Statistika dan Bisnis Muhammadiyah" />
 
-<meta name="date" content="2023-01-05" />
+<meta name="date" content="2023-01-10" />
 
 <title>Alogaritma FP Growth dengan R</title>
 
@@ -2777,7 +2777,7 @@ border-radius: 0px;
 <h1 class="title toc-ignore">Alogaritma FP Growth dengan R</h1>
 <h4 class="author">Mira Zayan-Institut Teknologi Statistika dan Bisnis
 Muhammadiyah</h4>
-<h4 class="date">2023-01-05</h4>
+<h4 class="date">2023-01-10</h4>
 
 </div>
 
@@ -2787,7 +2787,7 @@ body{
 text-align: justify}
 </style>
 <div id="algoritma-fp-growth" class="section level1">
-<h1>Algoritma FP Growth</h1>
+<h1>1. Algoritma FP Growth</h1>
 <p>Algoritma Frequent Pattern Growth (FP-Growth) adalah salah satu
 alternatif algoritma yang dapat digunakan untuk menentukan himpunan data
 yang paling sering muncul (frequent itemset) dalam sebuah kumpulan data.
@@ -2808,12 +2808,12 @@ menampilkan item/data yang paling sering muncul dengan konsep tree
 (FP-Tree) untuk menentukan frekuensi item terbanyak.</p>
 </div>
 <div id="tahapan-algoritma-fp-growth" class="section level1">
-<h1>Tahapan Algoritma FP Growth</h1>
+<h1>2. Tahapan Algoritma FP Growth</h1>
 </div>
 <div id="eksperimen-alogaritma-fp-growth" class="section level1">
-<h1>Eksperimen Alogaritma FP Growth</h1>
+<h1>3. Eksperimen Alogaritma FP Growth</h1>
 <div id="library" class="section level2">
-<h2>Library</h2>
+<h2>3.1 Library</h2>
 <pre class="r"><code>library(readr)
 df1 &lt;- read_csv(&quot;store_data.csv&quot;)</code></pre>
 <pre><code>## Rows: 7500 Columns: 20
@@ -2846,7 +2846,7 @@ library(arules)</code></pre>
 ## 5</code></pre>
 </div>
 <div id="memanggil-data" class="section level2">
-<h2>Memanggil Data</h2>
+<h2>3.2 Memanggil Data</h2>
 <pre class="r"><code>table = as(df2,&quot;transactions&quot;)
 table</code></pre>
 <pre><code>## transactions in sparse format with
@@ -2916,9 +2916,135 @@ data_item &lt;- sort(data_item, decreasing = T)
 head(data_item, 3)</code></pre>
 <pre><code>## mineral water          eggs     spaghetti 
 ##          1788          1348          1306</code></pre>
+<pre class="r"><code>#Konversi data_item menjadi data frame dengan kolom Nama_Produk dan Jumlah.
+data_item &lt;- data.frame(&quot;Nama Produk&quot; = names(data_item),
+                        &quot;Jumlah&quot; = data_item,
+                        row.names = NULL)
+
+print(data_item)</code></pre>
+<pre><code>##              Nama.Produk Jumlah
+## 1          mineral water   1788
+## 2                   eggs   1348
+## 3              spaghetti   1306
+## 4           french fries   1282
+## 5              chocolate   1229
+## 6              green tea    991
+## 7                   milk    972
+## 8            ground beef    737
+## 9      frozen vegetables    715
+## 10              pancakes    713
+## 11               burgers    654
+## 12                  cake    608
+## 13               cookies    603
+## 14              escalope    595
+## 15        low fat yogurt    574
+## 16                shrimp    536
+## 17              tomatoes    513
+## 18             olive oil    494
+## 19       frozen smoothie    475
+## 20                turkey    469
+## 21               chicken    450
+## 22      whole wheat rice    439
+## 23         grated cheese    393
+## 24           cooking oil    383
+## 25                  soup    379
+## 26         herb &amp; pepper    371
+## 27                 honey    356
+## 28             champagne    351
+## 29           fresh bread    323
+## 30                salmon    319
+## 31              brownies    253
+## 32               avocado    250
+## 33              hot dogs    243
+## 34        cottage cheese    239
+## 35          tomato juice    228
+## 36                butter    226
+## 37     whole wheat pasta    221
+## 38              red wine    211
+## 39           yogurt cake    205
+## 40            light mayo    204
+## 41            energy bar    203
+## 42          energy drink    200
+## 43                   ham    199
+## 44                pepper    199
+## 45               cereals    193
+## 46        vegetables mix    193
+## 47               muffins    181
+## 48                   oil    173
+## 49           french wine    169
+## 50            fresh tuna    167
+## 51          strawberries    160
+## 52             meatballs    157
+## 53               almonds    153
+## 54       parmesan cheese    149
+## 55  mushroom cream sauce    143
+## 56                  rice    141
+## 57           protein bar    139
+## 58                  mint    131
+## 59            white wine    124
+## 60                 pasta    118
+## 61           light cream    117
+## 62               carrots    115
+## 63             black tea    107
+## 64          tomato sauce    106
+## 65         fromage blanc    102
+## 66                  gums    101
+## 67              eggplant     99
+## 68  extra dark chocolate     90
+## 69                melons     90
+## 70            body spray     86
+## 71                  yams     86
+## 72             magazines     82
+## 73        barbecue sauce     81
+## 74                 cider     79
+## 75           nonfat milk     78
+## 76            candy bars     73
+## 77              zucchini     71
+## 78      whole weat flour     70
+## 79           blueberries     69
+## 80                  salt     69
+## 81             flax seed     68
+## 82          green grapes     68
+## 83     antioxydant juice     67
+## 84                 bacon     65
+## 85             bug spray     65
+## 86           green beans     65
+## 87   clothes accessories     63
+## 88            toothpaste     61
+## 89               shallot     58
+## 90         strong cheese     58
+## 91               spinach     53
+## 92       gluten free bar     52
+## 93              pet food     49
+## 94                  soda     47
+## 95       sparkling water     47
+## 96                 chili     46
+## 97            mayonnaise     46
+## 98               pickles     45
+## 99          burger sauce     44
+## 100       mint green tea     42
+## 101     hand protein bar     39
+## 102                salad     37
+## 103              shampoo     37
+## 104            asparagus     36
+## 105          cauliflower     36
+## 106                 corn     36
+## 107          babies food     34
+## 108             sandwich     34
+## 109         dessert wine     33
+## 110              ketchup     33
+## 111              oatmeal     33
+## 112      chocolate bread     32
+## 113              chutney     31
+## 114        mashed potato     31
+## 115                  tea     29
+## 116              bramble     14
+## 117                cream      7
+## 118              napkins      5
+## 119          water spray      3</code></pre>
 </div>
 <div id="summary-data" class="section level2">
-<h2>Summary Data</h2>
+<h2>3.3 Summary Data</h2>
 <pre class="r"><code>summary.default(table)</code></pre>
 <pre><code>##       Length        Class         Mode 
 ##         7501 transactions           S4</code></pre>
@@ -2948,6 +3074,73 @@ head(data_item, 3)</code></pre>
 ## 1           almonds
 ## 2 antioxydant juice
 ## 3         asparagus</code></pre>
+<pre class="r"><code>mba &lt;- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))</code></pre>
+<pre><code>## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.5    0.1    1 none FALSE            TRUE       5     0.1      1
+##  maxlen target  ext
+##      10  rules TRUE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 750 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[119 item(s), 7501 transaction(s)] done [0.00s].
+## sorting and recoding items ... [7 item(s)] done [0.00s].
+## creating transaction tree ... done [0.00s].
+## checking subsets of size 1 2 done [0.00s].
+## writing ... [0 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].</code></pre>
+<pre class="r"><code>apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))</code></pre>
+<pre><code>## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.5    0.1    1 none FALSE            TRUE       5     0.1      1
+##  maxlen target  ext
+##      10  rules TRUE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 750 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[119 item(s), 7501 transaction(s)] done [0.00s].
+## sorting and recoding items ... [7 item(s)] done [0.00s].
+## creating transaction tree ... done [0.00s].
+## checking subsets of size 1 2 done [0.00s].
+## writing ... [0 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].</code></pre>
+<pre><code>## set of 0 rules</code></pre>
+<pre class="r"><code>inspect(apriori(df2, parameter = list(supp = 0.1, confidence = 0.5)))</code></pre>
+<pre><code>## Apriori
+## 
+## Parameter specification:
+##  confidence minval smax arem  aval originalSupport maxtime support minlen
+##         0.5    0.1    1 none FALSE            TRUE       5     0.1      1
+##  maxlen target  ext
+##      10  rules TRUE
+## 
+## Algorithmic control:
+##  filter tree heap memopt load sort verbose
+##     0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+## 
+## Absolute minimum support count: 750 
+## 
+## set item appearances ...[0 item(s)] done [0.00s].
+## set transactions ...[119 item(s), 7501 transaction(s)] done [0.00s].
+## sorting and recoding items ... [7 item(s)] done [0.00s].
+## creating transaction tree ... done [0.00s].
+## checking subsets of size 1 2 done [0.00s].
+## writing ... [0 rule(s)] done [0.00s].
+## creating S4 object  ... done [0.00s].</code></pre>
 </div>
 <div id="item-frequency" class="section level2">
 <h2>Item Frequency</h2>
