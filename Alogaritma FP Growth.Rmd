@@ -88,6 +88,24 @@ data_item <- data.frame("Nama Produk" = names(data_item),
 
 print(data_item)
 ```
+```{r eval=FALSE}
+mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
+# Filter rhs dengan item "mineral water" dan tampilkan
+
+inspect(subset(mba, rhs %in% "mineral water"))
+```
+
+```{r}
+
+```
+
+## 3.3 Filter LHS
+```{r}
+mba <- apriori(df2)
+inspect(subset(mba, lhs %in% "eggs"))
+inspect(apriori(df2, parameter = list(supp = 0.1, confidence = 0.5)))
+```
+
 
 
 ## 3.3 Summary Data
@@ -101,6 +119,57 @@ mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
 apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
 inspect(apriori(df2, parameter = list(supp = 0.1, confidence = 0.5)))
 ```
+## 3.5 Visualisasi Graph
+
+```{r}
+
+library(arules)
+library(arulesViz)
+library(partykit)
+```
+
+```{r}
+df2 <- read.transactions(file = "store_data.csv",
+                               format = "single", 
+                               sep = "\t",
+                               cols = c(1,2),
+                               skip = 1)
+
+mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
+```
+
+
+```{r}
+# 4 figures arranged in 2 rows and 2 columns
+attach(mtcars)
+par(mfrow=c(2,2))
+plot(wt,mpg, main="Scatterplot of wt vs. mpg")
+plot(wt,disp, main="Scatterplot of wt vs disp")
+hist(wt, main="Histogram of wt")
+boxplot(wt, main="Boxplot of wt")
+```
+
+
+```{r}
+# S3 method for rules
+plot(df2, method = NULL, measure = "support", shading = "lift", 
+    interactive = NULL, engine = "default", data = NULL, control = NULL)
+# S3 method for itemsets
+plot(df2, method = NULL, measure = "support", shading = NA,
+    interactive = NULL, engine = "default", data = NULL, control = NULL)
+```
+
+```{r eval=FALSE}
+DTModel=J48("mineral water"~.,df2)
+DTModel
+```
+
+
+```{r eval=FALSE}
+plot(subset(mba, lift > 1.1), method = "graph")
+```
+
+
 
 
 ## Item Frequency
