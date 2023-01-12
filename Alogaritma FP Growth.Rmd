@@ -1,5 +1,5 @@
 ---
-title: "Alogaritma FP Growth dengan R"
+title: "Algoritma FP Growth dan Algoritma Apriori dengan R"
 author: "Mira Zayan-Institut Teknologi Statistika dan Bisnis Muhammadiyah"
 date: "`r Sys.Date()`"
 output: 
@@ -31,10 +31,8 @@ knitr::opts_chunk$set(echo = TRUE)
 Kesimpulan : Algoritma FP-Growth adalah perhitungan alogaritma untuk menampilkan item/data yang paling sering muncul dengan konsep tree (FP-Tree) untuk menentukan frekuensi item terbanyak.
 
 
-# 2. Tahapan Algoritma FP Growth
-
-# 3. Eksperimen Alogaritma FP Growth
-## 3.1 Library
+# 2. Eksperimen Alogaritma FP Growth
+## 2.1 Library
 
 ```{r warning=FALSE}
 library(readr)
@@ -46,14 +44,17 @@ df1
 ```{r}
 library(Matrix)
 library(arules)
+library(arulesViz)
 df2 = read.transactions("store_data.csv",sep=",",rm.duplicates=TRUE)
 ```
-## 3.2 Memanggil Data
+## 2.2 Memanggil Data
 
 ```{r}
 table = as(df2,"transactions")
 table
 ```
+
+## Menampilkan data sebagai Transaksi
 ```{r}
 read.transactions(file = "store_data.csv",
                   format = "single",
@@ -61,6 +62,104 @@ read.transactions(file = "store_data.csv",
                   cols = c(1,2),
                   skip = 1)
 ```
+
+## Menampilkan Daftar item Transaksi
+```{r}
+df2@itemInfo
+df2@itemsetInfo
+```
+
+## 2.3 Menampilkan Kombinasi dari Contoh Transaksi
+
+
+```{r}
+inspect(apriori(df2, parameter = list(support = .1, minlen = 2, target = 'frequent itemsets')))
+mba <- apriori(df2, parameter = list(support = .03, minlen = 2, target = 'frequent itemsets'))
+inspect(head(mba))
+```
+
+# Algoritma Apriori
+
+Algoritma apriori adalah salah satu algoritma yang merupakan penerapan praktis dari Market Basket Analysis (MBA). Algoritma ini digunakan untuk menganalisa banyaknya kombinasi produk yang terjadi di dalam transaksi ritel, yang akan sulit dan lama jika dilakukan secara manual.
+
+Secara teknis, algoritma apriori akan mencari tingkat asosiasi antar item di dalam banyak kombinasi kelompok data secara otomatis. Kombinasi ini juga bisa disusun dengan suatu aturan (rule) asosiasi “Jika membeli ini produk A maka akan membeli produk B”, sehingga algoritma ini dikategorikan sebagai Association Rules di ranah machine learning.
+
+
+# Item dan Transaksi
+
+```{r}
+transaksi_tabular <- read.csv("store_data.csv", sep = "\t")
+
+print(transaksi_tabular)
+```
+
+## 3.3 Summary Data
+
+```{r}
+summary.default(table)
+summary(table)
+```
+
+## Item Frequency
+```{r}
+itemFrequency(df2)
+itemFrequency(df2, type = "absolute")
+
+```
+## Statistik Top 3
+
+```{r}
+data_item <- itemFrequency(df2, type = "absolute")
+
+#Melakukan sorting pada data_item
+data_item <- sort(data_item, decreasing = T)
+
+#Mengambil 3 item pertama, atau bisa dengan data_item[1:3]
+head(data_item, 3)
+```
+
+```{r}
+#Konversi data_item menjadi data frame dengan kolom Nama_Produk dan Jumlah.
+data_item <- data.frame("Nama Produk" = names(data_item),
+                        "Jumlah" = data_item,
+                        row.names = NULL)
+
+print(data_item)
+```
+
+## Grafik Item Frekuensi
+```{r}
+itemFrequencyPlot(table,topN = 15, main="Item Frequency")
+
+```
+
+
+# Itemset dan Rules
+
+Tiap transaksi terdiri atas beberapa item atau itemset. Pada praktek sebelumnya, kita baru melihat visualisasi dan sebaran matrix dari tiap transaksi namun masih sulit dicerna.
+
+
+## Menghasilkan Rules dengan Apriori
+
+```{r}
+apriori(df2)
+```
+## Melihat Rules dengan Fungsi Inspect
+
+```{r}
+inspect(mba)
+```
+
+## Filter RHS
+
+```{r}
+mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
+inspect(subset(mba, rhs %in% "mineral water"))
+```
+```{r}
+inspect(subset(mba, rhs %in% "eggs"))
+```
+
 
 ```{r}
 # Menghasilkan model Market Basket Analysis
@@ -80,6 +179,8 @@ data_item <- sort(data_item, decreasing = T)
 #Mengambil 3 item pertama, atau bisa dengan data_item[1:3]
 head(data_item, 3)
 ```
+
+
 ```{r}
 #Konversi data_item menjadi data frame dengan kolom Nama_Produk dan Jumlah.
 data_item <- data.frame("Nama Produk" = names(data_item),
@@ -93,11 +194,9 @@ mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
 # Filter rhs dengan item "mineral water" dan tampilkan
 
 inspect(subset(mba, rhs %in% "mineral water"))
+inspect(subset(mba, (lhs %in% "mineral water" | rhs %in% "mineral water") & lift > 1))
 ```
 
-```{r}
-
-```
 
 ## 3.3 Filter LHS
 ```{r}
@@ -105,15 +204,17 @@ mba <- apriori(df2)
 inspect(subset(mba, lhs %in% "eggs"))
 inspect(apriori(df2, parameter = list(supp = 0.1, confidence = 0.5)))
 ```
-
-
-
-## 3.3 Summary Data
-
 ```{r}
-summary.default(table)
-summary(table)
+rules<-apriori(data=df2, parameter=list(supp=0.001,conf = 0.15,minlen=2), 
+               appearance = list(default="rhs",lhs="mineral water"),
+               control = list(verbose=F))
+rules<-sort(rules, decreasing=TRUE,by="confidence")
+inspect(rules[1:5])
 ```
+
+
+
+
 ```{r}
 mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
 apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
@@ -121,12 +222,6 @@ inspect(apriori(df2, parameter = list(supp = 0.1, confidence = 0.5)))
 ```
 ## 3.5 Visualisasi Graph
 
-```{r}
-
-library(arules)
-library(arulesViz)
-library(partykit)
-```
 
 ```{r}
 df2 <- read.transactions(file = "store_data.csv",
@@ -136,47 +231,26 @@ df2 <- read.transactions(file = "store_data.csv",
                                skip = 1)
 
 mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
+
 ```
 
 
 ```{r}
-# 4 figures arranged in 2 rows and 2 columns
-attach(mtcars)
-par(mfrow=c(2,2))
-plot(wt,mpg, main="Scatterplot of wt vs. mpg")
-plot(wt,disp, main="Scatterplot of wt vs disp")
-hist(wt, main="Histogram of wt")
-boxplot(wt, main="Boxplot of wt")
+image(df2[1:20], method="graph")
+plot(df2, (mba, lift > 1.1), method = "graph"))
 ```
 
-
-```{r}
-# S3 method for rules
-plot(df2, method = NULL, measure = "support", shading = "lift", 
-    interactive = NULL, engine = "default", data = NULL, control = NULL)
-# S3 method for itemsets
-plot(df2, method = NULL, measure = "support", shading = NA,
-    interactive = NULL, engine = "default", data = NULL, control = NULL)
-```
-
-```{r eval=FALSE}
-DTModel=J48("mineral water"~.,df2)
-DTModel
-```
-
-
-```{r eval=FALSE}
-plot(subset(mba, lift > 1.1), method = "graph")
-```
-
-
-
-
-## Item Frequency
-```{r}
-itemFrequencyPlot(table,topN = 15, main="Item Frequency")
-
-```
- 
 
 # Referensi
+1. https://rpubs.com/metro_dolan/mba_in_r
+
+
+2. https://rpubs.com/sitiramadeskaa/904549
+
+
+3.Dataset : https://github.com/ashishpatel26/Market-Basket-Analysis/blob/master/Data/store_data.csv
+
+4. https://github.com/mirazayan
+
+
+5. https://rpubs.com/mirazayan
