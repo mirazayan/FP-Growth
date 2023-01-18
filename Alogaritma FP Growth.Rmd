@@ -28,10 +28,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
  Algoritma FP-Growth merupakan pengembangan dari algoritma Apriori. Algoritma FP-Growth  dapat menghindari permasalahan jika jumlah calon itemset nya terlalu besar. FP-Growth menggunakan konsep pembangunan tree dalam pencarian frequent itemset. Hal tersebut yang menyebabkan algoritma FP-Growth lebih cepat dari algoritma Apriori. Dengan menggunakan FP-Tree, algoritma FP-Growth dapat langsung mengekstrak frequent itemset dari FP-Tree. Penggalian itemset yang frequent dengan menggunakan algoritma FP-Growth akan dilakukan dengan cara membangkitkan struktur data tree. (Erwin, 2009)
  
-Kesimpulan : Algoritma FP-Growth adalah perhitungan alogaritma untuk menampilkan item/data yang paling sering muncul dengan konsep tree (FP-Tree) untuk menentukan frekuensi item terbanyak.
+  Kesimpulan : Algoritma FP-Growth adalah perhitungan alogaritma untuk menampilkan item/data yang paling sering muncul dengan konsep tree (FP-Tree) untuk menentukan frekuensi item terbanyak.
 
 
-# 2. Eksperimen Alogaritma FP Growth
+# 2.Eksperimen Alogaritma FP Growth
 ## 2.1 Library
 
 ```{r warning=FALSE}
@@ -39,22 +39,24 @@ library(readr)
 df1 <- read_csv("store_data.csv")
 df1
 ```
-## Memanggil Library
+## 2.2 Memanggil Library
 
 ```{r}
 library(Matrix)
 library(arules)
-library(arulesViz)
+
 df2 = read.transactions("store_data.csv",sep=",",rm.duplicates=TRUE)
 ```
-## 2.2 Memanggil Data
+## 2.3 Memanggil Data
+
 
 ```{r}
 table = as(df2,"transactions")
 table
 ```
 
-## Menampilkan data sebagai Transaksi
+## 2.4 Menampilkan data sebagai Transaksi
+
 ```{r}
 read.transactions(file = "store_data.csv",
                   format = "single",
@@ -62,14 +64,28 @@ read.transactions(file = "store_data.csv",
                   cols = c(1,2),
                   skip = 1)
 ```
+Penjelasan dari baris kode diatas
 
-## Menampilkan Daftar item Transaksi
+File: Parameter lokasi file yang bisa berasal dari url di web satau lokal. Pada contoh ini dibaca file data_transaksi.txt
+data_transaksi.txt: lokasi dan nama file dataset. Jika lokasi file dan aplikasi R terdapat di komputer lokal Anda, maka gantilah dengan lokasi file di lokal. Misalkan c:_transaksi.txt
+format: Format bisa “single” atau “basket”. “single” artinya tiap item transaksi dituliskan terpisah baris demi baris, dan ini cocok dengan format dari file yang digunakan. “basket” artinya seluruh item per transaksi ditulis per baris.
+sep: separator character atau karakter pemisah antar kolom, untuk file ini karakter pemisahnya adalah tab atau dalam notasi di R ditulis dengan ".
+cols: indeks dari kolom-kolom yang digunakan. Untuk format single maka kolom harus dua saja, kolom pertama adalah kode transaksi sedangkan kolom kedua menunjukkan item transaksi. Penulisan c(1,2) pada contoh kita artinya kolom pertama dan kedua yang kita gunakan.
+skip: jumlah baris yang dilewati sebelum mulai membaca data. Untuk dataset kita, baris pertama adalah header dan tidak diperlukan, jadi kita masukkan 1 sebagai input.
+Penjelasan dari output kode diatas:
+
+transactions in sparse format: Ini artinya transaksi dalam bentuk sparse (tersebar). Ini mungkin akan lebih jelas ketika divisualiasikan dalam bentuk matriks.
+2718 transactions (rows): dataset kita secara total memiliki 2718 transaksi. Ada informasi rows atau baris disini, ini bukan berarti data kita ada 2718 baris di file yang digunakan. Karena pada kenyataannya, file memiliki baris data / distinct.
+2720 items (columns): dataset secara total memiliki 2720 item unik.
+
+
+## 2.5 Menampilkan Daftar item Transaksi
 ```{r}
 df2@itemInfo
 df2@itemsetInfo
 ```
 
-## 2.3 Menampilkan Kombinasi dari Contoh Transaksi
+## 2.6 Menampilkan Kombinasi dari Contoh Transaksi
 
 
 ```{r}
@@ -77,15 +93,22 @@ inspect(apriori(df2, parameter = list(support = .1, minlen = 2, target = 'freque
 mba <- apriori(df2, parameter = list(support = .03, minlen = 2, target = 'frequent itemsets'))
 inspect(head(mba))
 ```
+## 2.7 Hasil Akhir
 
-# Algoritma Apriori
+  Market Basket Analysis (MBA) adalah teknik analisa yang digunakan oleh bisnis di bidang ritel untuk mencari asosiasi produk yang kuat, atau dengan kata lain menemukan paket produk yang bisa berdampak besar pada penjualan.
 
-Algoritma apriori adalah salah satu algoritma yang merupakan penerapan praktis dari Market Basket Analysis (MBA). Algoritma ini digunakan untuk menganalisa banyaknya kombinasi produk yang terjadi di dalam transaksi ritel, yang akan sulit dan lama jika dilakukan secara manual.
+  Algoritma yang bisa digunakan di R untuk melakukan MBA ini adalah apriori dari package arules. Data yang diperlukan hanya dua, yaitu data transaksi dan data produk.
+  
+  
+# 3.Algoritma Apriori dan Rules
 
-Secara teknis, algoritma apriori akan mencari tingkat asosiasi antar item di dalam banyak kombinasi kelompok data secara otomatis. Kombinasi ini juga bisa disusun dengan suatu aturan (rule) asosiasi “Jika membeli ini produk A maka akan membeli produk B”, sehingga algoritma ini dikategorikan sebagai Association Rules di ranah machine learning.
+  Algoritma apriori adalah salah satu algoritma yang merupakan penerapan praktis dari Market Basket Analysis (MBA). Algoritma ini digunakan untuk menganalisa banyaknya kombinasi produk yang terjadi di dalam transaksi ritel, yang akan sulit dan lama jika dilakukan secara manual.
+
+  Secara teknis, algoritma apriori akan mencari tingkat asosiasi antar item di dalam banyak kombinasi kelompok data secara otomatis. Kombinasi ini juga bisa disusun dengan suatu aturan (rule) asosiasi “Jika membeli ini produk A maka akan membeli produk B”, sehingga algoritma ini dikategorikan sebagai Association Rules di ranah machine learning.
+  
 
 
-# Item dan Transaksi
+# 4.Item dan Transaksi
 
 ```{r}
 transaksi_tabular <- read.csv("store_data.csv", sep = "\t")
@@ -93,20 +116,20 @@ transaksi_tabular <- read.csv("store_data.csv", sep = "\t")
 print(transaksi_tabular)
 ```
 
-## 3.3 Summary Data
+## 4.1 Summary Data
 
 ```{r}
 summary.default(table)
 summary(table)
 ```
 
-## Item Frequency
+## 4.2 Item Frequency
 ```{r}
 itemFrequency(df2)
 itemFrequency(df2, type = "absolute")
 
 ```
-## Statistik Top 3
+## 4.3 Statistik Top 3
 
 ```{r}
 data_item <- itemFrequency(df2, type = "absolute")
@@ -127,30 +150,35 @@ data_item <- data.frame("Nama Produk" = names(data_item),
 print(data_item)
 ```
 
-## Grafik Item Frekuensi
+## 4.4 Grafik Item Frekuensi
 ```{r}
 itemFrequencyPlot(table,topN = 15, main="Item Frequency")
 
 ```
 
 
-# Itemset dan Rules
+# 5.Itemset dan Rules
 
-Tiap transaksi terdiri atas beberapa item atau itemset. Pada praktek sebelumnya, kita baru melihat visualisasi dan sebaran matrix dari tiap transaksi namun masih sulit dicerna.
+  Tiap transaksi terdiri atas beberapa item atau itemset. Pada praktek sebelumnya, kita baru melihat visualisasi dan sebaran matrix dari tiap transaksi namun masih sulit dicerna.
+  
+  Item adalah produk tunggal yang terdapat dalam suatu transaksi. 
+  
+  Itemset adalah kombinasi satu atau lebih item yang terdapat dalam satu transaksi. 
+  Rules adalah pernyataan hubungan antar Itemset. Biasanya dapat diformulasikan menjadi “Jika membeli itemset A, maka akan membeli itemset B”.
 
 
-## Menghasilkan Rules dengan Apriori
+## 5.1 Menghasilkan Rules dengan Apriori
 
 ```{r}
 apriori(df2)
 ```
-## Melihat Rules dengan Fungsi Inspect
+## 5.2 Melihat Rules dengan Fungsi Inspect
 
 ```{r}
 inspect(mba)
 ```
 
-## Filter RHS
+## 5.3 Filter RHS
 
 ```{r}
 mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
@@ -198,7 +226,7 @@ inspect(subset(mba, (lhs %in% "mineral water" | rhs %in% "mineral water") & lift
 ```
 
 
-## 3.3 Filter LHS
+## 5.4 Filter LHS
 ```{r}
 mba <- apriori(df2)
 inspect(subset(mba, lhs %in% "eggs"))
@@ -220,10 +248,11 @@ mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
 apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
 inspect(apriori(df2, parameter = list(supp = 0.1, confidence = 0.5)))
 ```
-## 3.5 Visualisasi Graph
+## 5.5 Visualisasi Graph
 
 
 ```{r}
+library(arulesViz)
 df2 <- read.transactions(file = "store_data.csv",
                                format = "single", 
                                sep = "\t",
@@ -237,11 +266,19 @@ mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
 
 ```{r}
 image(df2[1:20], method="graph")
-plot(df2, (mba, lift > 1.1), method = "graph"))
+plot(df2, method="graph")
 ```
 
+## 5.6 Kesimpulan
 
-# Referensi
+  Algoritma apriori adalah salah satu algoritma yang merupakan penerapan praktis dari Market Basket Analysis (MBA). Algoritma ini digunakan untuk menganalisa banyaknya kombinasi produk yang terjadi di dalam transaksi ritel, yang akan sulit dan lama jika dilakukan secara manual.
+
+  Secara teknis, algoritma apriori akan mencari tingkat asosiasi antar item di dalam banyak kombinasi kelompok data secara otomatis. Kombinasi ini juga bisa disusun dengan suatu aturan (rule) asosiasi “Jika membeli ini produk A maka akan membeli produk B”, sehingga algoritma ini dikategorikan sebagai Association Rules di ranah machine learning.
+
+  Dengan menemukan paket produk yang asosiasinya kuat, Anda sebagai seorang data scientist dapat menyarankan kepada bisnis dapat melakukan berbagai action item seperti membuat paket produk dengan penawaran khusus, mendekatkan produk-produk tersebut saling berdekatan dalam satu rak, mengeluarkan rekomendasi produk di sistem e-commerce, mengurangi masalah stok, dan lain-lain.
+  
+  
+# 6.Referensi
 1. https://rpubs.com/metro_dolan/mba_in_r
 
 
