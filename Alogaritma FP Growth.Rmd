@@ -68,10 +68,15 @@ Penjelasan dari baris kode diatas
 
 File: Parameter lokasi file yang bisa berasal dari url di web satau lokal. Pada contoh ini dibaca file data_transaksi.txt
 data_transaksi.txt: lokasi dan nama file dataset. Jika lokasi file dan aplikasi R terdapat di komputer lokal Anda, maka gantilah dengan lokasi file di lokal. Misalkan c:_transaksi.txt
+
 format: Format bisa “single” atau “basket”. “single” artinya tiap item transaksi dituliskan terpisah baris demi baris, dan ini cocok dengan format dari file yang digunakan. “basket” artinya seluruh item per transaksi ditulis per baris.
+
 sep: separator character atau karakter pemisah antar kolom, untuk file ini karakter pemisahnya adalah tab atau dalam notasi di R ditulis dengan ".
+
 cols: indeks dari kolom-kolom yang digunakan. Untuk format single maka kolom harus dua saja, kolom pertama adalah kode transaksi sedangkan kolom kedua menunjukkan item transaksi. Penulisan c(1,2) pada contoh kita artinya kolom pertama dan kedua yang kita gunakan.
+
 skip: jumlah baris yang dilewati sebelum mulai membaca data. Untuk dataset kita, baris pertama adalah header dan tidak diperlukan, jadi kita masukkan 1 sebagai input.
+
 Penjelasan dari output kode diatas:
 
 transactions in sparse format: Ini artinya transaksi dalam bentuk sparse (tersebar). Ini mungkin akan lebih jelas ketika divisualiasikan dalam bentuk matriks.
@@ -80,19 +85,17 @@ transactions in sparse format: Ini artinya transaksi dalam bentuk sparse (terseb
 
 
 ## 2.5 Menampilkan Daftar item Transaksi
+
+Item-item yang terdapat pada objek transactions dapat dilihat pada komponen itemInfo dengan didahului aksesor @ , jadi ditulis @iteminfo. Ini bermanfaat untuk melihat daftar unik item yang terdapat pada data transaksi yang sedang dianalisa.
+
+Sepuluh transaksi yang telah dibaca oleh read.transactions dapat dilihat detil kode-kodenya dengan menggunakan komponen itemsetInfo dengan aksesor @ , atau lengkapnya ditulis dengan @itemsetInfo. Daftar ini bisa bermanfaat sebagai basis untuk menganalisa atau melakukan validasi dengan data yang ada pada sistem ritel.
+
 ```{r}
 df2@itemInfo
 df2@itemsetInfo
 ```
 
-## 2.6 Menampilkan Kombinasi dari Contoh Transaksi
 
-
-```{r}
-inspect(apriori(df2, parameter = list(support = .1, minlen = 2, target = 'frequent itemsets')))
-mba <- apriori(df2, parameter = list(support = .03, minlen = 2, target = 'frequent itemsets'))
-inspect(head(mba))
-```
 ## 2.7 Hasil Akhir
 
   Market Basket Analysis (MBA) adalah teknik analisa yang digunakan oleh bisnis di bidang ritel untuk mencari asosiasi produk yang kuat, atau dengan kata lain menemukan paket produk yang bisa berdampak besar pada penjualan.
@@ -124,12 +127,23 @@ summary(table)
 ```
 
 ## 4.2 Item Frequency
+
+Mengetahui item dengan jumlah kemunculannnya pada keseluruhan transaksi. Informasi ini disebut sebagai item frequency.
+
+Untuk menghasilkan informasi ini kita gunakan fungsi itemFrequency dengan input objek transaction, dan hasilnya berupa named vector atau vektor yang bisa diakses dengan nama.
 ```{r}
 itemFrequency(df2)
-itemFrequency(df2, type = "absolute")
 
 ```
+```{r}
+itemFrequency(df2, type = "absolute")
+```
+
+Fungsi itemFrequency ini sangat penting untuk membantu kita menganalisa transaksi yang lebih kompleks dimana item yang terlibat lebih banyak dan transaksi yang terjadi lebih besar dari contoh kita saat ini.
+
 ## 4.3 Statistik Top 3
+
+Statistik sederhana untuk menjawab pertanyaaan seperti “Mana 3 item yang memiliki jumlah terbanyak di seluruh transaksi?” tidak bisa langsung dilakukan dengan satu fungsi di R, tapi perlu penggabungan beberapa perintah dimana salah satunya adalah fungsi sort.
 
 ```{r}
 data_item <- itemFrequency(df2, type = "absolute")
@@ -150,7 +164,34 @@ data_item <- data.frame("Nama Produk" = names(data_item),
 print(data_item)
 ```
 
-## 4.4 Grafik Item Frekuensi
+
+Penjelasan dari fungsi data.frame() diatas:
+
+data.frame: fungsi untuk membuat suatu data frame.
+
+“Nama Produk” <- names(data_item): adalah nama kolom pertama (“Nama Produk”) yang diisi dengan nama atau label dari vector data_item (mineral water, eggs, spagetti)
+
+“Jumlah” <- data_item: adalah nama kolom kedua (“Jumlah”) yang diisi dengan nilai-nilai vektor data_item (8, 6, 5)
+
+row.names = NULL: artinya tidak memerlukan label pada tiap baris data frame.
+
+
+
+## 4.4 Menampilkan Kombinasi dari Contoh Transaksi
+
+
+```{r}
+inspect(apriori(df2, parameter = list(support = .1, minlen = 2, target = 'frequent itemsets')))
+mba <- apriori(df2, parameter = list(support = .03, minlen = 2, target = 'frequent itemsets'))
+inspect(head(mba))
+```
+
+## 4.5 Grafik Item Frekuensi
+
+Selain tampilan transaksi dalam bentuk matriks, kita bisa juga melihat distribusi transaksi dari tiap item dalam bentuk grafik dengan menggunakan fungsi itemFrequencyPlot.
+
+Perintahnya sederhana, seperti terlihat pada contoh berikut dimana kita plot distribusi dari dataset kita;
+
 ```{r}
 itemFrequencyPlot(table,topN = 15, main="Item Frequency")
 
@@ -166,26 +207,37 @@ itemFrequencyPlot(table,topN = 15, main="Item Frequency")
   Itemset adalah kombinasi satu atau lebih item yang terdapat dalam satu transaksi. 
   Rules adalah pernyataan hubungan antar Itemset. Biasanya dapat diformulasikan menjadi “Jika membeli itemset A, maka akan membeli itemset B”.
 
+Pada bagian ini, “Item, Itemset and Rules” telah dijelaskan dengan gamblang mengenai apa yang dimaksud dengan item, itemset yang terdiri dari beberapa item, dan rules yang menjelaskan hubungan antar itemset yang terdiri dari lhs (left hand side) dan rhs (right hand side).
 
 ## 5.1 Menghasilkan Rules dengan Apriori
 
+Rule adalah formula yang menyatakan kombinasi dari dua itemset. Satu itemset ada di bagian kiri rule (left hand side) dan satunya di bagian kanan (right hand side).
 ```{r}
 apriori(df2)
 ```
 ## 5.2 Melihat Rules dengan Fungsi Inspect
 
+Hasil eksekusi apriori berupa rules sudah disimpan dalam variable bernama “mba”. Jadi untuk menampilkan isi rules pada variabel ini kita gunakan perintah berikut.
 ```{r}
 inspect(mba)
 ```
 
+Terlihat kalau variable mba menyimpan tiga rules dengan kolom-kolom berikut:
+
+lhs: itemset di bagian kiri (left hand side)
+rhs: itemset di bagian kanan (right hand side)
+support, confidence dan lift: metrik-metrik yang digunakan untuk menilai kualitas dari rule. Umumnya semakin besar semakin baik. Detil dari metrik-metrik ini akan dibahas selanjutnya.
+
 ## 5.3 Filter RHS
+
+Dari hasil inspect objek mba yang bertipe association rules di praktek sebelumnya, kita sekarang mengerti bahwa objek tersebut mengandung banyak informasi termasuk itemset yang terdapat di left hand side dan right hand side.
 
 ```{r}
 mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
 inspect(subset(mba, rhs %in% "mineral water"))
 ```
-```{r}
-inspect(subset(mba, rhs %in% "eggs"))
+```{r eval=FALSE}
+inspect(subset(mba, rhs %in% "spagetti"))
 ```
 
 
@@ -193,45 +245,31 @@ inspect(subset(mba, rhs %in% "eggs"))
 # Menghasilkan model Market Basket Analysis
 mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
 
-# Menampilkan jumlah kombinasi dari produk yang terdapat pada daftar transaksi yang ada
-inspect(apriori(df2, parameter = list(support = .1, minlen = 2, target = 'frequent itemsets')))
 ```
 
-
-```{r}
-data_item <- itemFrequency(df2, type = "absolute")
-
-#Melakukan sorting pada data_item
-data_item <- sort(data_item, decreasing = T)
-
-#Mengambil 3 item pertama, atau bisa dengan data_item[1:3]
-head(data_item, 3)
-```
-
-
-```{r}
-#Konversi data_item menjadi data frame dengan kolom Nama_Produk dan Jumlah.
-data_item <- data.frame("Nama Produk" = names(data_item),
-                        "Jumlah" = data_item,
-                        row.names = NULL)
-
-print(data_item)
-```
-```{r eval=FALSE}
-mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
-# Filter rhs dengan item "mineral water" dan tampilkan
-
-inspect(subset(mba, rhs %in% "mineral water"))
-inspect(subset(mba, (lhs %in% "mineral water" | rhs %in% "mineral water") & lift > 1))
-```
 
 
 ## 5.4 Filter LHS
 ```{r}
 mba <- apriori(df2)
-inspect(subset(mba, lhs %in% "eggs"))
+inspect(subset(mba, lhs %in% "chocolate"))
 inspect(apriori(df2, parameter = list(supp = 0.1, confidence = 0.5)))
 ```
+
+Kita sebenarnya bisa melakukan filter untuk kedua sisi dengan menggunakan operator “&” untuk AND dan operator “|” untuk OR.
+
+Berikut adalah contoh perintah inspect untuk filter lhs dengan item chocolate dan rhs dengan item spagetti.
+
+```{r eval=FALSE}
+inspect(subset(mba, lhs %in% "chocolate" & rhs %in% "spagetti"))
+```
+
+## Kesimpulan
+
+Pada latihan sebelumnya. “Item, Itemset dan Rules” telah dijelaskan dengan gamblang mengenai apa yang dimaksud dengan item, itemset yang terdiri dari beberapa item, dan rules yang menjelaskan hubungan antar itemset yang terdiri dari lhs (left hand side) dan rhs (right hand side).
+
+# 6.Scoring and Evaluation: Support, Confidence, and Lift
+
 ```{r}
 rules<-apriori(data=df2, parameter=list(supp=0.001,conf = 0.15,minlen=2), 
                appearance = list(default="rhs",lhs="mineral water"),
@@ -248,11 +286,93 @@ mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
 apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
 inspect(apriori(df2, parameter = list(supp = 0.1, confidence = 0.5)))
 ```
-## 5.5 Visualisasi Graph
+## 6.1 Menghasilkan Rules dengan Parameter Support dan Confidence
 
+Kita menghasilkan tiga rules dengan function apriori secara default* tanpa parameter apapun. Padahal sebenarnya kita bisa memasukkan parameter tambahan berupa support dan confidence.
+
+Tanpa parameter tambahan tersebut, maka nilai minimum support adalah 0.1 dan minimum confidence adalah 0.8 sebagai filter dari fungsi “apriori”.
+
+Berikut adalah perintah untuk menghasilkan kembali association rules dengan function apriori, tapi kali ini dengan tambahan parameter minimum support dan confidence masing-masing bernilai 0.1 dan 0.5.
+
+Berikut contohnya:
 
 ```{r}
+apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
+```
+Untuk melihat rules apa saja yang terdapat di dalam rules tersebut, maka kita harus menggunakan fungsi inspect(), bisa dengan menyimpan association rules ke dalam variabel atau langsung dengan menggunakan fungsi.
+
+```{r}
+inspect(apriori(df2, parameter = list(supp = 0.1, confidence = 0.5)))
+```
+
+## 6.2 Filter LHS dan RHS
+
+Fungsi “subset” di bawah ini berguna untuk melakukan filter berdasarkan lhs atau rhs yang memiliki item "spagetti"
+
+```{r eval=FALSE}
+inspect(subset(mba, lhs %in% "spagetti" | rhs %in% "spagetti"))
+```
+
+## 6.3 Filter Berdasarkan Lift
+Kita bisa melakukan filter terhadap metrik kualitas dari association rules: support, confidence dan lift dengan function subset. Function yang sama untuk melakukan filter terhadap lhs dan rhs.
+
+Bedanya adalah karena angka, maka untuk ketiga metrik tersebut kita gunakan operator perbandingan angka.
+
+Sebagai contoh, untuk melakukan filter terhadap objek mba dengan kondisi berikut:
+
+lhs atau rhs memiliki Teh Celup
+lift di atas 1
+maka perintahnya adalah sebagai berikut:
+
+
+```{r eval=FALSE}
+subset(mba, (lhs %in% "spagetti" | rhs %in% "spagetti") & lift > 1)
+```
+Perhatikan untuk ekspresi lhs dan rhs ditutup dengan kurung sebelum digabungkan dengan kondisi lift.
+
+```{r}
+mba <- apriori(df2,parameter = list(supp = 0.1, confidence = 0.5))
+```
+
+```{r eval=FALSE}
+inspect(subset(mba, (lhs %in% "spagetti" | rhs %in% "spagetti") & lift > 1))
+```
+## 6.4 Rekomendasi - Filter dengan %ain%
+
+Operator %in% yang sebelumnya kita gunakan sudah efektif. Namun operator ini tidak cocok jika kita ingin melakukan filter itemset dengan logika AND. Artinya seluruh item harus muncul dalam itemset yang terpilih. Untuk keperluan tersebut, gunakan operator %ain%.
+
+Contoh subset yang menggunakan “%ain%” adalah sebagai berikut:
+
+```{r}
+subset(mba, (lhs %ain% c("chocolate", "eggs")))
+```
+
+Dan ekspresi inilah menjadi kunci untuk membuat rekomendasi.
+
+```{r}
+mba <- apriori(df2,parameter = list(supp = 0.1, confidence = 0.5))
+```
+
+```{r}
+inspect(subset(mba, (lhs %ain% c("chocolate", "eggs"))))
+```
+
+
+## 6.5 Visualisasi Graph
+
+Sejauh ini Anda telah menghasilkan rules dan mengerti bagaimana metrik kualitas dapat digunakan sebagai basis pemilihan rule.
+
+Namun ketika item semakin banyak, maka proses memilih berdasarkan angka-angka saja cukup merepotkan. Kadangkala visualisasi bisa sangat membantu analisa di proses ini.
+
+Jenis visualisasi cukup banyak, namun kita akan gunakan visualisasi bertipe graph yang terdapat pada package arulesViz – suatu package dengan visualisasi khusus untuk association rules.
+
+```{r}
+library(arules)
 library(arulesViz)
+```
+
+```{r}
+
 df2 <- read.transactions(file = "store_data.csv",
                                format = "single", 
                                sep = "\t",
@@ -262,14 +382,16 @@ df2 <- read.transactions(file = "store_data.csv",
 mba <- apriori(df2, parameter = list(supp = 0.1, confidence = 0.5))
 
 ```
-
+```{r eval=FALSE}
+plot(subset(mba, lift > 1.1), method = "graph")
+```
 
 ```{r}
 image(df2[1:20], method="graph")
 plot(df2, method="graph")
 ```
 
-## 5.6 Kesimpulan
+## 6.6 Kesimpulan
 
   Algoritma apriori adalah salah satu algoritma yang merupakan penerapan praktis dari Market Basket Analysis (MBA). Algoritma ini digunakan untuk menganalisa banyaknya kombinasi produk yang terjadi di dalam transaksi ritel, yang akan sulit dan lama jika dilakukan secara manual.
 
@@ -278,14 +400,14 @@ plot(df2, method="graph")
   Dengan menemukan paket produk yang asosiasinya kuat, Anda sebagai seorang data scientist dapat menyarankan kepada bisnis dapat melakukan berbagai action item seperti membuat paket produk dengan penawaran khusus, mendekatkan produk-produk tersebut saling berdekatan dalam satu rak, mengeluarkan rekomendasi produk di sistem e-commerce, mengurangi masalah stok, dan lain-lain.
   
   
-# 6.Referensi
+# 7.Referensi
 1. https://rpubs.com/metro_dolan/mba_in_r
 
 
 2. https://rpubs.com/sitiramadeskaa/904549
 
 
-3.Dataset : https://github.com/ashishpatel26/Market-Basket-Analysis/blob/master/Data/store_data.csv
+3.Dataset: https://github.com/ashishpatel26/Market-Basket-Analysis/blob/master/Data/store_data.csv
 
 4. https://github.com/mirazayan
 
